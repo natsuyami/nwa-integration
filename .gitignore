@@ -1,0 +1,59 @@
+nwa-common-service/HELP.md
+nwa-common-service/target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**
+!**/src/test/**
+nwa-common-service/application.log
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### STS nwa-common-service/ ###
+nwa-common-service/.apt_generated
+nwa-common-service/.classpath
+nwa-common-service/.factorypath
+nwa-common-service/.project
+nwa-common-service/.settings
+nwa-common-service/.springBeans
+nwa-common-service/.sts4-cache
+
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### IntelliJ IDEA nwa-common-service/ ###
+nwa-common-service/.idea
+nwa-common-service/*.iws
+nwa-common-service/*.iml
+nwa-common-service/*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+
+### NetBeans nwa-common-service/ ###
+nwa-common-service/nbproject/private/
+nwa-common-service/nbbuild/
+nwa-common-service/dist/
+nwa-common-service/nbdist/
+nwa-common-service/.nb-gradle/
+nwa-common-service/build/
+
+### VS Code ###
+.vscode/
+
+### VS Code nwa-common-service/ ###
+nwa-common-service/.vscode/
