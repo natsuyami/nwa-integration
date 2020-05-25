@@ -4,6 +4,7 @@ nwa-common-service/target/
 !**/src/main/**
 !**/src/test/**
 nwa-common-service/application.log
+application.log
 
 ### STS ###
 .apt_generated

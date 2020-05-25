@@ -1,11 +1,14 @@
 package com.natsuyami.project.nwa.common.http;
 
+import com.natsuyami.project.nwa.common.constant.NwaContentType;
 import java.util.List;
-import java.util.Map;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ClientHttpRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.BodyInserter;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -16,10 +19,10 @@ public class NwaRestTemplate {
 
   public NwaRestTemplate() {
     this.webClient = WebClient
-      .builder()
-      .defaultCookie("cookieKey", "cookieValue")
-      .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-      .build();
+        .builder()
+        .defaultCookie("cookieKey", "cookieValue")
+        .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .build();
   }
 
   public String uriBuilder(String uri, MultiValueMap<String, String> requestParam) {
@@ -29,7 +32,8 @@ public class NwaRestTemplate {
     return query.toUriString();
   }
 
-  public <S> S get(String uri, Class<S> responseClass) {
+  public <S> S get(String uri, NwaContentType contentType, Class<S> responseClass) {
+    setContentType(contentType);
 
     return webClient.get()
         .uri(uri)
@@ -38,7 +42,8 @@ public class NwaRestTemplate {
         .block();
   }
 
-  public <S> List<S> getList(String uri, Class<S> responseClass) {
+  public <S> List<S> getList(String uri, NwaContentType contentType, Class<S> responseClass) {
+    setContentType(contentType);
 
     return webClient.get()
         .uri(uri)
@@ -48,7 +53,18 @@ public class NwaRestTemplate {
         .block();
   }
 
-  public <S,T> S post(String uri, Class<T> requestParam, Class<S> responseClass) {
+  public <S,T> S post(String uri, NwaContentType contentType, Class<S> responseClass) {
+    setContentType(contentType);
+
+    return webClient.post()
+        .uri(uri)
+        .retrieve()
+        .bodyToMono(responseClass) // responsible for the type of object that the request retrieve
+        .block();
+  }
+
+  public <S,T> S post(String uri, T requestParam, NwaContentType contentType, Class<S> responseClass) {
+    setContentType(contentType);
 
     return webClient.post()
         .uri(uri)
@@ -56,5 +72,68 @@ public class NwaRestTemplate {
         .retrieve()
         .bodyToMono(responseClass) // responsible for the type of object that the request retrieve
         .block();
+  }
+
+  public <S> S post(String uri, BodyInserter requestParam, NwaContentType contentType, Class<S> responseClass) {
+    setContentType(contentType);
+
+    return webClient.post()
+        .uri(uri)
+        .body(requestParam) // body parameter for the request (type is generic)
+        .retrieve()
+        .bodyToMono(responseClass) // responsible for the type of object that the request retrieve
+        .block();
+  }
+
+  public BodyInserters.FormInserter createToken(String clientId, String clientSecret, String username, String password) {
+    return BodyInserters
+            .fromFormData("client_id", clientId)
+            .with("client_secret", clientSecret)
+            .with("username", username)
+            .with("password", password)
+            .with("grant_type", "password");
+  }
+
+  public <S, T> S post(String uri, T requestParam, NwaContentType contentType, String token, Class<S> responseClass) {
+    setContentType(contentType);
+
+    return webClient.post()
+        .uri(uri)
+        .header("Authorization", "Bearer " + token)
+        .bodyValue(requestParam) // body parameter for the request (type is generic)
+        .retrieve()
+        .bodyToMono(responseClass) // responsible for the type of object that the request retrieve
+        .block();
+  }
+
+
+  /*
+  * set content type of the header for the request
+  */
+  private void setContentType(NwaContentType contentType) {
+
+    switch (contentType) {
+      case URL_ENCODED:
+        this.webClient = WebClient
+            .builder()
+            .defaultCookie("cookieKey", "cookieValue")
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+            .build();
+        break;
+      case TEXT_PLAIN:
+        this.webClient = WebClient
+            .builder()
+            .defaultCookie("cookieKey", "cookieValue")
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE)
+            .build();
+        break;
+      default:
+        this.webClient = WebClient
+            .builder()
+            .defaultCookie("cookieKey", "cookieValue")
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .build();
+        break;
+    }
   }
 }
