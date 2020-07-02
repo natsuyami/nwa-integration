@@ -14,11 +14,11 @@ public class NwaSecretKey {
   private SecretKeySpec secretKey;
   private static byte[] key;
 
-  protected SecretKeySpec getSecretKey() {
+  public SecretKeySpec getSecretKey() {
     return this.secretKey;
   }
 
-  protected void generateKey(String baseEncryption, int intKey) {
+  public void generateKey(String baseEncryption, int intKey) {
     LOGGER.info("generate key for encryption and decryption");
 
     MessageDigest sha = null;

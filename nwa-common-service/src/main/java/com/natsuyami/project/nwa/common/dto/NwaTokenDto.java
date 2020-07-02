@@ -1,47 +1,53 @@
 package com.natsuyami.project.nwa.common.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 
 public class NwaTokenDto implements Serializable {
 
   private static final long serialVersionUID = 3429789906171015679L;
-  private String access_token;
 
-  private String refresh_token;
+  @JsonProperty("access_token")
+  private String accessToken;
 
-  private String expires_in;
+  @JsonProperty("refresh_token")
+  private String refreshToken;
 
-  private String refresh_expires_in;
+  @JsonProperty("expires_in")
+  private String expiresIn;
 
-  public String getAccess_token() {
-    return access_token;
+  @JsonProperty("refresh_expires_in")
+  private String refreshExpiresIn;
+
+  public String getAccessToken() {
+    return accessToken;
   }
 
-  public void setAccess_token(String access_token) {
-    this.access_token = access_token;
+  public void setAccessToken(String accessToken) {
+    this.accessToken = accessToken;
   }
 
-  public String getRefresh_token() {
-    return refresh_token;
+  public String getRefreshToken() {
+    return refreshToken;
   }
 
-  public void setRefresh_token(String refresh_token) {
-    this.refresh_token = refresh_token;
+  public void setRefreshToken(String refreshToken) {
+    this.refreshToken = refreshToken;
   }
 
-  public String getExpires_in() {
-    return expires_in;
+  public String getExpiresIn() {
+    return expiresIn;
   }
 
-  public void setExpires_in(String expires_in) {
-    this.expires_in = expires_in;
+  public void setExpiresIn(String expiresIn) {
+    this.expiresIn = expiresIn;
   }
 
-  public String getRefresh_expires_in() {
-    return refresh_expires_in;
+  public String getRefreshExpiresIn() {
+    return refreshExpiresIn;
   }
 
-  public void setRefresh_expires_in(String refresh_expires_in) {
-    this.refresh_expires_in = refresh_expires_in;
+  public void setRefreshExpiresIn(String refreshExpiresIn) {
+    this.refreshExpiresIn = refreshExpiresIn;
   }
 }

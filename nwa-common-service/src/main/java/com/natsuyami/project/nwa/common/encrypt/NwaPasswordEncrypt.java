@@ -81,6 +81,6 @@ public class NwaPasswordEncrypt {
       LOGGER.error("Unavailable to decrpyt the strToEncrypt={}", strToDecrypt);
       e.printStackTrace();
     }
-    return null;
+    return "";
   }
 }
