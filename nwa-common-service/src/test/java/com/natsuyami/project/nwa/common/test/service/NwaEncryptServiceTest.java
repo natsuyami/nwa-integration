@@ -4,11 +4,14 @@ import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 
+import com.natsuyami.project.nwa.common.encrypt.NwaContentEncyption;
 import com.natsuyami.project.nwa.common.encrypt.NwaEncryptionLayer;
 import com.natsuyami.project.nwa.common.encrypt.NwaPasswordEncrypt;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.Base64;
 
 @RunWith(SpringRunner.class)
 public class NwaEncryptServiceTest {
@@ -53,4 +56,19 @@ public class NwaEncryptServiceTest {
     assertThat(hash, not(equalTo(decrypted)));
   }
 
+  @Test
+  public void encryptContentTest() throws Exception {
+    String testOne = "test-data";
+    String testTwo = "testing of @#$# data 123";
+
+    String[] keys = NwaContentEncyption.generateKeys();
+    String encryptedOne = NwaContentEncyption.encrypt(testOne, keys[1]);
+    String encryptedTwo = NwaContentEncyption.encrypt(testTwo, keys[1]);
+
+    assertThat(testOne, equalTo(NwaContentEncyption.decrypt(encryptedOne,
+            keys[0])));
+    assertThat(testOne, not(equalTo(NwaContentEncyption.decrypt(encryptedTwo,
+            keys[0]))));
+
+  }
 }
