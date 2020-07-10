@@ -16,24 +16,21 @@ public class NwaPasswordEncrypt {
    */
   public static String[] originalEncryption(String password, String secret) {
     LOGGER.info("Initialized originalEncryption for additional layer for password and secret");
-    String[] result = new String[3];
+    String[] result = new String[2];
+    StringBuilder secretReverse =new StringBuilder();
 
     if (password.isEmpty() && secret.isEmpty()) {
       return result;
     }
 
-    String hexPass = NwaEncryptionLayer.concatRandomHexa(NwaEncryptionLayer.convertToHex(password)); // get some random hexa from string
-    String hexSecret = NwaEncryptionLayer.concatRandomHexa(NwaEncryptionLayer.convertToHex(secret)); // get some random hexa from string
-    int hexToIntPass = Integer.parseInt(hexPass, 16);
-    int hexToIntSecret = Integer.parseInt(hexSecret, 16);
-    int hexOperation = hexToIntPass - hexToIntSecret;
+    secretReverse.append(secret);
+    secretReverse.reverse();
 
-    if (hexOperation < 1) {
-      hexOperation = (hexToIntSecret/hexToIntPass);
-    }
-    result[0] = Integer.toHexString(hexOperation * 8); //use for generate secret
-    result[1] = String.valueOf(hexToIntSecret); //use for generate secret
-    result[2] = NwaEncryptionLayer.hashString(result[0], NwaEncryptionLayer.generateSalt()); // password with the salt separated by .
+    secret= secretReverse.toString();
+    password = NwaEncryptionLayer.shuffleString(password);
+
+    result[0] = NwaEncryptionLayer.hashString(password, NwaEncryptionLayer.generateSalt()); // password with the salt separated by .
+    result[1] = secret; //use for generate secret
     return result;
   }
 
@@ -45,16 +42,15 @@ public class NwaPasswordEncrypt {
    */
   public static String encrypt(String strToEncrypt, String secret) {
     LOGGER.info("Initialized encrypt for base encryption of password and secret");
-    String[] encryptions = originalEncryption(strToEncrypt, secret);
     NwaSecretKey nwaSecretKey =  new NwaSecretKey();
 
     try {
-      nwaSecretKey.generateKey(encryptions[0], Integer.parseInt(encryptions[1]));
+      nwaSecretKey.generateKey(secret);
       Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
       cipher.init(Cipher.ENCRYPT_MODE, nwaSecretKey.getSecretKey());
-      return Base64.getEncoder().encodeToString(cipher.doFinal(encryptions[2].getBytes("UTF-8")));
+      return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
     } catch (Exception e) {
-      LOGGER.error("Unavailable to encypt the strToEncrypt={}", encryptions[2]);
+      LOGGER.error("Unavailable to encypt the strToEncrypt={}", strToEncrypt);
       e.printStackTrace();
     }
     return null;
@@ -62,18 +58,16 @@ public class NwaPasswordEncrypt {
 
   /**
    *
-   * @param strToEncrypt - stored password
    * @param secret - {code} entered as 2nd layer password
    * @param strToDecrypt - stored password
    * @return - decrypt password
    */
-  public static String decrypt(String strToEncrypt, String secret, String strToDecrypt) {
+  public static String decrypt(String secret, String strToDecrypt) {
     LOGGER.info("Initialized encrypt for base decryption of password and secret");
-    String[] encryptions = originalEncryption(strToEncrypt, secret);
-    NwaSecretKey nwaSecretKey =  new NwaSecretKey();
 
+    NwaSecretKey nwaSecretKey =  new NwaSecretKey();
     try {
-      nwaSecretKey.generateKey(encryptions[0], Integer.parseInt(encryptions[1]));
+      nwaSecretKey.generateKey(secret);
       Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
       cipher.init(Cipher.DECRYPT_MODE, nwaSecretKey.getSecretKey());
       return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));

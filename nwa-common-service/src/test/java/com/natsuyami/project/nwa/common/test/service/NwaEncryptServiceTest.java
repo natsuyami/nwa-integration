@@ -5,13 +5,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 
 import com.natsuyami.project.nwa.common.encrypt.NwaContentEncyption;
-import com.natsuyami.project.nwa.common.encrypt.NwaEncryptionLayer;
 import com.natsuyami.project.nwa.common.encrypt.NwaPasswordEncrypt;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.Base64;
 
 @RunWith(SpringRunner.class)
 public class NwaEncryptServiceTest {
@@ -21,12 +18,11 @@ public class NwaEncryptServiceTest {
     String password = "TestingPassword";
     String secret = "12093489";
 
-    String encrypted = NwaPasswordEncrypt.encrypt(password, secret);
-    String decrypted = NwaPasswordEncrypt.decrypt(password, secret, encrypted);
-    String[] random = NwaPasswordEncrypt.originalEncryption(password, secret);
-    String hash = NwaEncryptionLayer.hashString(random[0], decrypted.split("\\.")[1]);
+    String[] hashVal = NwaPasswordEncrypt.originalEncryption(password, secret);
+    String encrypted = NwaPasswordEncrypt.encrypt(hashVal[0], hashVal[1]);
+    String decrypted = NwaPasswordEncrypt.decrypt(hashVal[1], encrypted);
 
-    assertThat(hash, equalTo(decrypted));
+    assertThat(hashVal[0], equalTo(decrypted));
   }
 
   @Test
@@ -35,25 +31,28 @@ public class NwaEncryptServiceTest {
     String passwordTwo = "TestingPasswordTwo";
     String secret = "12093489";
 
-    String encrypted = NwaPasswordEncrypt.encrypt(password, secret);
-    String decrypted = NwaPasswordEncrypt.decrypt(password, secret, encrypted);
-    String[] random = NwaPasswordEncrypt.originalEncryption(passwordTwo, secret);
-    String hash = NwaEncryptionLayer.hashString(random[0], decrypted.split("\\.")[1]);
+    String[] hashVal = NwaPasswordEncrypt.originalEncryption(password, secret);
+    String encrypted = NwaPasswordEncrypt.encrypt(hashVal[0], hashVal[1]);
+    String decrypted = NwaPasswordEncrypt.decrypt(hashVal[1], encrypted);
+    String[] hashValTwo = NwaPasswordEncrypt.originalEncryption(passwordTwo, secret);
+    String[] hashValThree = NwaPasswordEncrypt.originalEncryption(password, secret);
 
-    assertThat(hash, not(equalTo(decrypted)));
+    assertThat(hashValThree[0], not(equalTo(decrypted)));
+    assertThat(hashValTwo[0], not(equalTo(decrypted)));
   }
+
   @Test
   public void encryptSecretNotSame() {
     String password = "TestingPassword";
-    String secretTwo = "111233314";
+    String fakeSecret = "111233314";
     String secret = "12093489";
 
-    String encrypted = NwaPasswordEncrypt.encrypt(password, secret);
-    String decrypted = NwaPasswordEncrypt.decrypt(password, secret, encrypted);
-    String[] random = NwaPasswordEncrypt.originalEncryption(password, secretTwo);
-    String hash = NwaEncryptionLayer.hashString(random[0], decrypted.split("\\.")[1]);
+    String[] hashVal = NwaPasswordEncrypt.originalEncryption(password, secret);
+    String[] hashValTwo = NwaPasswordEncrypt.originalEncryption(password, fakeSecret);
+    String encrypted = NwaPasswordEncrypt.encrypt(hashVal[0], hashVal[1]);
+    String decrypt = NwaPasswordEncrypt.decrypt(hashValTwo[1], encrypted);
 
-    assertThat(hash, not(equalTo(decrypted)));
+    assertThat("", equalTo(decrypt));
   }
 
   @Test

@@ -4,6 +4,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -14,33 +16,23 @@ public class NwaEncryptionLayer {
   private static final Logger LOGGER = LoggerFactory.getLogger(NwaEncryptionLayer.class);
   private static final Random RANDOM = new SecureRandom();
 
-  protected static String convertToHex(String str) {
-    LOGGER.info("Initialized convertToHex for string to hex conversion");
+  public static String shuffleString(String input) {
+    LOGGER.info("Initialized shuffleString to shuffle the characters in the string input={{}}", input);
 
-    char[] strArray = str.toCharArray();
-    String hexa = "";
-
-    for (int a=0; a < strArray.length; a++) {
-      hexa += Integer.toHexString(strArray[a]);
+    List<Character> characters = new ArrayList<Character>();
+    for (char c:input.toCharArray()) {
+      characters.add(c);
     }
-
-    return hexa;
-  }
-
-  protected static String concatRandomHexa(String hexa) {
-    LOGGER.info("Initialized concatRandomHexa for random generated hex, based from given hexadecimal");
-
-    int strLength = hexa.length();
-    int strHalfLength = (strLength/2) - 1;
-    String firstHexa = hexa.substring(0, 2);
-    String secHexa = hexa.substring(strHalfLength, strHalfLength + 2);
-    String thirdHexa = hexa.substring(strLength - 2, strLength - 1);
-
-    return firstHexa.concat(secHexa.concat(thirdHexa));
+    StringBuilder output = new StringBuilder(input.length());
+    while (characters.size()!=0) {
+      int randPicker = (int) (Math.random()*characters.size());
+      output.append(characters.remove(randPicker));
+    }
+    return output.toString();
   }
 
   public static String hashString(String str, String salt) {
-    LOGGER.info("Initialized hashString to hash and put a salt to a string");
+    LOGGER.info("Initialized hashString to hash and put a salt to a string str={{}}", str);
 
     try {
       KeySpec spec = new PBEKeySpec(str.toCharArray(), salt.getBytes(), 65536, 128);
@@ -53,7 +45,7 @@ public class NwaEncryptionLayer {
         if(hex.length() == 1) hexString.append('0');
         hexString.append(hex);
       }
-      return hexString.toString() + "." + salt.toString();
+      return hexString.toString();
     } catch(Exception e) {
       e.printStackTrace();
     }
@@ -62,7 +54,7 @@ public class NwaEncryptionLayer {
   }
 
   protected static String commonHash(String str) {
-    LOGGER.info("Initialized commonHash generate basic hash");
+    LOGGER.info("Initialized commonHash generate basic hash str={{}}", str);
 
     try {
       MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -84,6 +76,8 @@ public class NwaEncryptionLayer {
   }
 
   public static String generateSalt() {
+    LOGGER.info("Initialized generateSalt, generating salt");
+
     byte[] salt = new byte[16];
     RANDOM.nextBytes(salt);
 

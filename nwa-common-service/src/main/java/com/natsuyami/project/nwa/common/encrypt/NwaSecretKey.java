@@ -18,14 +18,13 @@ public class NwaSecretKey {
     return this.secretKey;
   }
 
-  public void generateKey(String baseEncryption, int intKey) {
+  public void generateKey(String secret) {
     LOGGER.info("generate key for encryption and decryption");
 
     MessageDigest sha = null;
 
-    String myKey = this.generateSecret(baseEncryption, intKey);
     try {
-      key = myKey.getBytes("UTF-8");
+      key = secret.getBytes("UTF-8");
       sha = MessageDigest.getInstance("SHA-256");
       key = sha.digest(key);
       key = Arrays.copyOf(key, 16);
@@ -38,17 +37,4 @@ public class NwaSecretKey {
       e.printStackTrace();
     }
   }
-
-  protected static String generateSecret(String hexStr, int intSecret) {
-    LOGGER.info("generate secret for encryption and decryption");
-
-    int intOperation = (intSecret * 8) + Integer.parseInt(hexStr, 16);
-    String secret = Integer.toHexString(intOperation);
-    if (secret.length() > 255) {
-      secret = secret.substring(0, 255);
-    }
-
-    return NwaEncryptionLayer.commonHash(secret);
-  }
-
 }

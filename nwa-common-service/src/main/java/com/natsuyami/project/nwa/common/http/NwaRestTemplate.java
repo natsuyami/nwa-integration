@@ -132,7 +132,7 @@ public class NwaRestTemplate {
    * @param password
    * @return BodyInserters
    */
-  public BodyInserters.FormInserter createToken(String clientId, String clientSecret, String username, String password) {
+  public BodyInserters.FormInserter kcTokenCred(String clientId, String clientSecret, String username, String password) {
     return BodyInserters
         .fromFormData("client_id", clientId)
         .with("client_secret", clientSecret)
